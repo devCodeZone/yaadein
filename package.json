@@ -97,7 +97,7 @@
         "provider": "github",
         "owner": "devCodeZone",
         "repo": "yaadein",
-        "releaseType": "release"
+        "releaseType": "draft"
       }
     ]
   },

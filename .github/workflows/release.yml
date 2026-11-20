@@ -2,11 +2,13 @@
 #  release.yml — builds the desktop installers automatically on GitHub.
 #
 #  How to publish a new version:
-#     1. bump "version" in package.json (e.g. 1.0.1)
-#     2. git tag v1.0.1 && git push --tags
+#     1. bump "version" in package.json (e.g. 1.0.1) and push
+#     2. GitHub → Actions → "Build installers" → Run workflow
+#        (or push a tag:  git tag v1.0.1 && git push --tags)
 #  GitHub then builds Windows (.exe), macOS (.dmg) and Linux (.AppImage) on
-#  its own machines (free for public repos) and attaches them to a Release.
-#  You can also run it by hand: Actions tab → "Build installers" → Run workflow.
+#  its own machines (free for public repos) and publishes them as a Release.
+#
+#  Three stages:  prepare (draft release) → build ×3 OSes (upload) → publish
 # ============================================================================
 name: Build installers
 
@@ -19,7 +21,25 @@ permissions:
   contents: write # needed to create the Release and upload files
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: echo "tag=v$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+      - name: Create a draft release (if it doesn't exist yet)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ steps.v.outputs.tag }}" >/dev/null 2>&1 || \
+          gh release create "${{ steps.v.outputs.tag }}" --draft --target "$GITHUB_SHA" \
+            --title "Yaadein ${{ steps.v.outputs.tag }}" \
+            --notes "Download the installer for your computer below. Windows: Yaadein-Setup-*.exe · macOS: *.dmg · Linux: *.AppImage. The installers are not code-signed: on Windows click 'More info → Run anyway', on a Mac right-click → Open."
+
   build:
+    needs: prepare
     strategy:
       fail-fast: false
       matrix:
@@ -34,8 +54,17 @@ jobs:
       - run: npm install
       - run: npm test
       - run: npm run build
-      - name: Package & upload to the GitHub Release
+      - name: Package & upload to the draft release
         run: npx electron-builder --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false # installers are not code-signed
+
+  publish:
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ needs.prepare.outputs.tag }}" --draft=false --latest --repo "$GITHUB_REPOSITORY"
