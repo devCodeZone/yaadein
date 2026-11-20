@@ -1,0 +1,66 @@
+/*
+ * theme.css — design tokens (CSS custom properties).
+ *
+ * Two themes:
+ *   "Darkroom" (dark)  – warm espresso blacks, marigold accent, like a photo lab
+ *   "Album"    (light) – soft paper/cream tones, like an old family album
+ *
+ * Every colour in app.css uses these variables, so changing the look of the
+ * whole app means editing only this file. <html data-theme="…"> switches theme.
+ */
+:root,
+[data-theme='dark'] {
+  --bg: #14100d;
+  --bg-glow-1: rgba(244, 166, 42, 0.07);
+  --bg-glow-2: rgba(233, 112, 127, 0.05);
+  --surface: #1d1713;
+  --surface-2: #261f19;
+  --surface-3: #31281f;
+  --line: #3a2f26;
+  --text: #f6ede2;
+  --muted: #a8977f;
+  --accent: #f4a62a; /* marigold — गेंदा */
+  --accent-2: #ffcf7a;
+  --accent-ink: #1d1207;
+  --rose: #ec7a86;
+  --teal: #5cc4b4;
+  --danger: #ff7b6b;
+  --ok: #7fd18b;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --tile-bg: #2a221b;
+  --overlay: rgba(10, 7, 5, 0.96);
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: #f6efe4;
+  --bg-glow-1: rgba(217, 134, 26, 0.1);
+  --bg-glow-2: rgba(214, 92, 108, 0.06);
+  --surface: #fffaf2;
+  --surface-2: #f3e9da;
+  --surface-3: #eadcc8;
+  --line: #e2d3bd;
+  --text: #2b2018;
+  --muted: #7f6c59;
+  --accent: #d47f12;
+  --accent-2: #b86a08;
+  --accent-ink: #fffaf2;
+  --rose: #c95564;
+  --teal: #2b8f82;
+  --danger: #c8442f;
+  --ok: #2f8a43;
+  --shadow: 0 10px 30px rgba(92, 62, 30, 0.14);
+  --tile-bg: #eadfcf;
+  --overlay: rgba(20, 14, 9, 0.95);
+  color-scheme: light;
+}
+
+:root {
+  --font-display: 'Fraunces Variable', 'Georgia', serif;
+  --font-body: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --sidebar: 236px;
+  --topbar: 68px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

@@ -1,0 +1,41 @@
+# ============================================================================
+#  release.yml — builds the desktop installers automatically on GitHub.
+#
+#  How to publish a new version:
+#     1. bump "version" in package.json (e.g. 1.0.1)
+#     2. git tag v1.0.1 && git push --tags
+#  GitHub then builds Windows (.exe), macOS (.dmg) and Linux (.AppImage) on
+#  its own machines (free for public repos) and attaches them to a Release.
+#  You can also run it by hand: Actions tab → "Build installers" → Run workflow.
+# ============================================================================
+name: Build installers
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed to create the Release and upload files
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # `npm install` (not `npm ci`) so each OS gets its own native helpers
+      - run: npm install
+      - run: npm test
+      - run: npm run build
+      - name: Package & upload to the GitHub Release
+        run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false # installers are not code-signed

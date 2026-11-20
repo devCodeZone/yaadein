@@ -1,0 +1,8 @@
+node_modules/
+dist/
+release/
+android/
+ios/
+public/models/face/
+public/models/mobilenet/
+*.log
