@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: v
-        run: echo "tag=v$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+        run: echo "tag=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Create a draft release (if it doesn't exist yet)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
